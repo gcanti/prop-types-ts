@@ -1,4 +1,4 @@
-Alternative syntax for prop types powered by io-ts
+Alternative syntax for prop types powered by [io-ts](https://github.com/gcanti/io-ts)
 
 # How it works
 
@@ -24,6 +24,7 @@ const RuntimeProps = t.object({
 
 // extract the static type
 export type Props = t.TypeOf<typeof RuntimeProps>;
+// same as type Props = { type: 'success' | 'warning' | 'info' }
 
 @props(RuntimeProps)
 export default class Alert extends React.Component<Props, void> {
