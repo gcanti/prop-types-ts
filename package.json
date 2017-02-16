@@ -10,7 +10,7 @@
   "jsnext:main": "lib-jsnext/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "test": "mocha -r ts-node/register test/*.ts",
+    "test": "mocha -r ts-node/register test/*.tsx",
     "build": "rm -rf lib/* && tsc && tsc -m es6 --outDir lib-jsnext"
   },
   "repository": {
@@ -24,7 +24,8 @@
   },
   "homepage": "https://github.com/gcanti/prop-types-ts",
   "dependencies": {
-    "io-ts": "^0.0.2"
+    "io-ts": "^0.1.0",
+    "react": "^15.0.0"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.38",

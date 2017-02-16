@@ -15,7 +15,8 @@
     "strictNullChecks": true,
     "target": "es5",
     "moduleResolution": "node",
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react"
   },
   "include": [
     "./src/**/*"

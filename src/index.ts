@@ -1,6 +1,7 @@
 import { ComponentClass } from 'react'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/reporters/default'
+import * as React from 'react'
 
 const noop = () => {}
 
@@ -45,3 +46,24 @@ export function props<T extends t.Type<any>, P extends t.TypeOf<T>>(type: T, opt
   }
   return noop
 }
+
+export const ReactElement = new t.Type<React.ReactElement<any>>(
+  'ReactElement',
+  (v, c) => React.isValidElement(v) ? t.success(v) : t.failure<React.ReactElement<any>>(v, c)
+)
+
+export const ReactChild = new t.Type<React.ReactChild>(
+  'ReactChild',
+  (v, c) => t.string.is(v) || t.number.is(v) || ReactElement.is(v) ? t.success(v) : t.failure<React.ReactChild>(v, c)
+)
+
+export const ReactFragment: t.Type<React.ReactFragment> = new t.Type<React.ReactFragment>(
+  'ReactFragment',
+  (v, c) => t.Dictionary.is(v) || t.array(ReactNode).is(v) ? t.success(v) : t.failure<React.ReactFragment>(v, c)
+)
+
+export const ReactNode = new t.Type<React.ReactNode>(
+  'ReactNode',
+  (v, c) => ReactChild.is(v) || ReactFragment.is(v) || t.boolean.is(v) || t.null.is(v) || t.undefined.is(v) ? t.success(v) : t.failure<React.ReactNode>(v, c)
+)
+

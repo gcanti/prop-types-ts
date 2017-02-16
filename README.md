@@ -58,3 +58,12 @@ export default class Alert extends React.Component<Props, void> {
   ...
 }
 ```
+
+# Pre-defined types
+
+`prop-types-ts` exports some useful pre-defined types:
+
+- `ReactElement`
+- `ReactChild`
+- `ReactFragment`
+- `ReactNode`
