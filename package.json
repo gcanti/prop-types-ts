@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/gcanti/prop-types-ts",
   "dependencies": {
-    "io-ts": "^0.1.0",
+    "io-ts": "^0.1.1",
     "react": "^15.0.0"
   },
   "devDependencies": {
