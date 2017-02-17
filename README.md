@@ -11,18 +11,20 @@ import * as React from 'react'
 import * as t from 'io-ts'
 import { props } from 'prop-types-ts'
 
-// define the runtime type
-const AlertType = t.union([
-  t.literal('success'),
-  t.literal('warning'),
-  t.literal('info')
-], 'AlertType')
+// define the runtime types
+
+const AlertType = t.keyof({
+  success: true,
+  warning: true,
+  info: true
+}, 'AlertType')
 
 const RuntimeProps = t.object({
   type: AlertType
 }, 'Props')
 
 // extract the static type
+
 export type Props = t.TypeOf<typeof RuntimeProps>;
 // same as type Props = { type: 'success' | 'warning' | 'info' }
 
