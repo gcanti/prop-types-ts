@@ -39,6 +39,12 @@ describe('getPropTypes', () => {
     assertNoError(T, { name: 'name', a: 1 }, { strict: false })
   });
 
+  it('should handle children option', function () {
+    const T = t.interface({ name: t.string })
+    assertNoError(T, { name: 'name', children: 1 }, { children: t.number })
+    assertError(T, { name: 'name', children: 's' }, '\nInvalid value "s" supplied to children: number', { children: t.number })
+  });
+
 })
 
 describe('Pre-defined types', () => {

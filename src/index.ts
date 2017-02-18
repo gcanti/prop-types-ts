@@ -5,12 +5,15 @@ import * as React from 'react'
 
 const noop = () => {}
 
-export type Options = { strict?: boolean };
+export type Options = {
+  strict?: boolean,
+  children?: t.Type<any>
+};
 
 function getExcessProps(values: Object, props: t.Props): Array<string> {
   const excess: Array<string> = []
   for (let k in values) {
-    if (!props.hasOwnProperty(k)) {
+    if (k !== 'children' && !props.hasOwnProperty(k)) {
       excess.push(k);
     }
   }
@@ -19,8 +22,14 @@ function getExcessProps(values: Object, props: t.Props): Array<string> {
 
 export function getPropTypes(type: t.Type<any>, options: Options = { strict: true }) {
   return {
-    __prop_types_ts(values: Object, prop: string, displayName: string): Error | null {
+    __prop_types_ts(values: any, prop: string, displayName: string): Error | null {
       const validation = t.validate(values, type)
+        .chain(v => {
+          if (options.children) {
+            return options.children.validate(values.children, [{ key: 'children', type: options.children }])
+          }
+          return t.success(v)
+        })
       return validation.fold(
         () => new Error('\n' + PathReporter.report(validation).join('\n')),
         () => {
@@ -37,7 +46,7 @@ export function getPropTypes(type: t.Type<any>, options: Options = { strict: tru
   }
 }
 
-export function props<T extends t.Type<any>, P extends t.TypeOf<T>>(type: T, options?: Options): (C: ComponentClass<P>) => void {
+export function props<T extends t.Type<any>>(type: T, options?: Options): (C: ComponentClass<any>) => void {
   if (process.env.NODE_ENV !== 'production') {
     const propsTypes = getPropTypes(type, options)
     return function (Component) {

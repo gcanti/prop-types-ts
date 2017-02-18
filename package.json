@@ -1,7 +1,7 @@
 {
   "name": "prop-types-ts",
-  "version": "0.0.1",
-  "description": "A porting of scala monocle library to TypeScript",
+  "version": "0.0.2",
+  "description": "Alternative syntax for prop types providing both static and runtime type safety, powered by io-ts",
   "files": [
     "lib",
     "lib-jsnext"
