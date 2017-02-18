@@ -5,27 +5,45 @@ import * as React from 'react'
 
 const noop = () => {}
 
-export type Options = { strict?: boolean };
+export type PropType = t.InterfaceType<any> | t.RefinementType<t.InterfaceType<any>>;
+
+export type Options = {
+  strict?: boolean,
+  children?: t.Type<any>
+};
 
 function getExcessProps(values: Object, props: t.Props): Array<string> {
   const excess: Array<string> = []
   for (let k in values) {
-    if (!props.hasOwnProperty(k)) {
+    if (k !== 'children' && !props.hasOwnProperty(k)) {
       excess.push(k);
     }
   }
   return excess
 }
 
-export function getPropTypes(type: t.Type<any>, options: Options = { strict: true }) {
+function getProps(type: PropType): t.Props {
+  if (type instanceof t.InterfaceType) {
+    return type.props
+  }
+  return getProps(type.type as t.InterfaceType<any>)
+}
+
+export function getPropTypes(type: PropType, options: Options = { strict: true }) {
   return {
-    __prop_types_ts(values: Object, prop: string, displayName: string): Error | null {
+    __prop_types_ts(values: any, prop: string, displayName: string): Error | null {
       const validation = t.validate(values, type)
+        .chain(v => {
+          if (options.children) {
+            return options.children.validate(values.children, [{ key: 'children', type: options.children }])
+          }
+          return t.success(v)
+        })
       return validation.fold(
         () => new Error('\n' + PathReporter.report(validation).join('\n')),
         () => {
           if (options.strict) {
-            const excess = getExcessProps(values, (type as any).props)
+            const excess = getExcessProps(values, getProps(type))
             if (excess.length > 0) {
               return new Error(`\nInvalid additional prop(s): ${JSON.stringify(excess)}`);
             }
@@ -37,7 +55,7 @@ export function getPropTypes(type: t.Type<any>, options: Options = { strict: tru
   }
 }
 
-export function props<T extends t.Type<any>, P extends t.TypeOf<T>>(type: T, options?: Options): (C: ComponentClass<P>) => void {
+export function props(type: PropType, options?: Options): (C: ComponentClass<any>) => void {
   if (process.env.NODE_ENV !== 'production') {
     const propsTypes = getPropTypes(type, options)
     return function (Component) {

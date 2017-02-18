@@ -61,6 +61,21 @@ export default class Alert extends React.Component<Props, void> {
 }
 ```
 
+# Type checking `children`
+
+You can type check childrens with the optional `children` option
+
+```ts
+@props(RuntimeProps, { children: t.string })
+export default class Alert extends React.Component<Props, void> {
+  ...
+}
+
+<Alert type="foo">{1}</Alert>
+```
+
+Output: `Invalid value 1 supplied to children: string`
+
 # Pre-defined types
 
 `prop-types-ts` exports some useful pre-defined types:

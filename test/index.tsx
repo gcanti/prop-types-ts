@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import { getPropTypes, Options, ReactElement, ReactNode, ReactFragment } from '../src/index'
+import { getPropTypes, Options, ReactElement, ReactNode, ReactFragment, PropType } from '../src/index'
 import * as t from 'io-ts'
 import * as React from 'react'
 
@@ -7,7 +7,7 @@ function runPropTypes(propTypes: { __prop_types_ts: Function }, values: Object):
   return propTypes.__prop_types_ts(values, '__prop_types_ts', '<diplayName>');
 }
 
-function assertError(type: t.Type<any>, values: Object, message: string, options?: Options) {
+function assertError(type: PropType, values: Object, message: string, options?: Options) {
   const error = runPropTypes(getPropTypes(type, options), values)
   if (error !== null) {
     assert.strictEqual(error.message, message)
@@ -16,7 +16,7 @@ function assertError(type: t.Type<any>, values: Object, message: string, options
   }
 }
 
-function assertNoError(type: t.Type<any>, values: Object, options?: Options) {
+function assertNoError(type: PropType, values: Object, options?: Options) {
   const error = runPropTypes(getPropTypes(type, options), values)
   assert.strictEqual(error, null)
 }
@@ -37,6 +37,18 @@ describe('getPropTypes', () => {
   it('should handle strict = false option', function () {
     const T = t.interface({ name: t.string })
     assertNoError(T, { name: 'name', a: 1 }, { strict: false })
+  });
+
+  it('should handle children option', function () {
+    const T = t.interface({ name: t.string })
+    assertNoError(T, { name: 'name', children: 1 }, { children: t.number })
+    assertError(T, { name: 'name', children: 's' }, '\nInvalid value "s" supplied to children: number', { children: t.number })
+  });
+
+  it('should handle refinements', function () {
+    const T = t.refinement(t.interface({ a: t.number }), v => v.a >= 0)
+    assertNoError(T, { a: 1 })
+    assertError(T, { a: -1 }, '\nInvalid value {"a":-1} supplied to : ({ a: number } | <function1>)')
   });
 
 })
