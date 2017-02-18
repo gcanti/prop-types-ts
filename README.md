@@ -19,7 +19,7 @@ const AlertType = t.keyof({
   info: true
 }, 'AlertType')
 
-const RuntimeProps = t.object({
+const RuntimeProps = t.interface({
   type: AlertType
 }, 'Props')
 
@@ -36,19 +36,30 @@ export default class Alert extends React.Component<Props, void> {
 }
 ```
 
-# Errors
+# Without decorators
 
 ```ts
-<Alert type="foo" />
+import { getPropTypes } from 'prop-types-ts'
+
+...
+
+export default class Alert extends React.Component<Props, void> {
+  static propTypes = getPropTypes(RuntimeProps)
+  render() {
+    return <div>{this.props.children}</div>
+  }
+}
 ```
 
-Output: `Invalid value "foo" supplied to : Props/type: AlertType`
+# Errors on console
 
 ```ts
-<Alert type="info" foo="bar" />
+<Alert type="foo" /> // => Invalid value "foo" supplied to : Props/type: AlertType
 ```
 
-Output: `Invalid additional prop(s): ["foo"]`
+```ts
+<Alert type="info" foo="bar" /> // => Invalid additional prop(s): ["foo"]
+```
 
 # Excess Property Checks
 
@@ -61,21 +72,6 @@ export default class Alert extends React.Component<Props, void> {
 }
 ```
 
-# Type checking `children`
-
-You can type check childrens with the optional `children` option
-
-```ts
-@props(RuntimeProps, { children: t.string })
-export default class Alert extends React.Component<Props, void> {
-  ...
-}
-
-<Alert type="foo">{1}</Alert>
-```
-
-Output: `Invalid value 1 supplied to children: string`
-
 # Pre-defined types
 
 `prop-types-ts` exports some useful pre-defined types:
@@ -84,3 +80,48 @@ Output: `Invalid value 1 supplied to children: string`
 - `ReactChild`
 - `ReactFragment`
 - `ReactNode`
+
+# Type checking `children`
+
+Use the `children` option
+
+```ts
+@props(RuntimeProps, { children: t.string })
+export default class Alert extends React.Component<Props, void> {
+  ...
+}
+
+<Alert type="info">{1}</Alert> // => Invalid value 1 supplied to children: string
+<Alert type="info">hello</Alert> // no errors
+```
+
+You can use any [io-ts](https://github.com/gcanti/io-ts) type
+
+```ts
+import { props, ReactChild } from 'prop-types-ts'
+
+@props(RuntimeProps, { children: t.tuple([t.string, ReactChild]) })
+export default class Alert extends React.Component<Props, void> {
+  ...
+}
+
+<Alert type="info">hello</Alert> // => Invalid value "hello" supplied to children: [string, ReactChild]
+<Alert type="info">hello <b>world</b></Alert> // no errors
+```
+
+works for `Component`s too
+
+```ts
+import * as t from 'io-ts'
+import { props, ReactElement } from 'prop-types-ts'
+
+const JSXButton = t.refinement(ReactElement, e => e.type === 'button', 'JSXButton')
+
+@props(RuntimeProps, { children: JSXButton })
+export default class Alert extends React.Component<Props, void> {
+  ...
+}
+
+<Alert type="info">hello</Alert> // => Invalid value "hello" supplied to children: JSXButton
+<Alert type="info"><button>Click me</button></Alert> // no errors
+```
