@@ -5,8 +5,6 @@ import * as React from 'react'
 
 const noop = () => {}
 
-export type PropType = t.InterfaceType<any> | t.RefinementType<t.InterfaceType<any>>;
-
 export type Options = {
   strict?: boolean,
   children?: t.Type<any>
@@ -22,14 +20,24 @@ function getExcessProps(values: Object, props: t.Props): Array<string> {
   return excess
 }
 
-function getProps(type: PropType): t.Props {
-  if (type instanceof t.InterfaceType) {
+function getProps(type: t.Any): t.Props | null {
+  if (type instanceof t.RefinementType || type instanceof t.ReadonlyType) {
+    return getProps(type.type)
+  }
+  if (type instanceof t.IntersectionType) {
+    const props = type.types.map(getProps).filter(Boolean)
+    if (props.length) {
+      return Object.assign.apply(null, [{}].concat(props))
+    }
+  }
+  if (type instanceof t.InterfaceType || type instanceof t.PartialType) {
     return type.props
   }
-  return getProps(type.type as t.InterfaceType<any>)
+  return null
 }
 
-export function getPropTypes(type: PropType, options: Options = { strict: true }) {
+export function getPropTypes(type: t.Any, options: Options = { strict: true }) {
+  const props = options.strict ? getProps(type) : null
   return {
     __prop_types_ts(values: any, prop: string, displayName: string): Error | null {
       const validation = t.validate(values, type)
@@ -42,8 +50,8 @@ export function getPropTypes(type: PropType, options: Options = { strict: true }
       return validation.fold(
         () => new Error('\n' + PathReporter.report(validation).join('\n')),
         () => {
-          if (options.strict) {
-            const excess = getExcessProps(values, getProps(type))
+          if (props) {
+            const excess = getExcessProps(values, props)
             if (excess.length > 0) {
               return new Error(`\nInvalid additional prop(s): ${JSON.stringify(excess)}`);
             }
@@ -55,7 +63,7 @@ export function getPropTypes(type: PropType, options: Options = { strict: true }
   }
 }
 
-export function props(type: PropType, options?: Options): (C: ComponentClass<any>) => void {
+export function props(type: t.Any, options?: Options): (C: ComponentClass<any>) => void {
   if (process.env.NODE_ENV !== 'production') {
     const propsTypes = getPropTypes(type, options)
     return function (Component) {
