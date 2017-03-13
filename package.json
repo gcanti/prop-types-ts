@@ -1,6 +1,6 @@
 {
   "name": "prop-types-ts",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Alternative syntax for prop types providing both static and runtime type safety, powered by io-ts",
   "files": [
     "lib",
