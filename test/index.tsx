@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import { getPropTypes, Options, ReactElement, ReactNode, ReactFragment, PropType } from '../src/index'
+import { getPropTypes, Options, ReactElement, ReactNode, ReactFragment } from '../src/index'
 import * as t from 'io-ts'
 import * as React from 'react'
 
@@ -7,7 +7,7 @@ function runPropTypes(propTypes: { __prop_types_ts: Function }, values: Object):
   return propTypes.__prop_types_ts(values, '__prop_types_ts', '<diplayName>');
 }
 
-function assertError(type: PropType, values: Object, message: string, options?: Options) {
+function assertError(type: t.Any, values: Object, message: string, options?: Options) {
   const error = runPropTypes(getPropTypes(type, options), values)
   if (error !== null) {
     assert.strictEqual(error.message, message)
@@ -16,7 +16,7 @@ function assertError(type: PropType, values: Object, message: string, options?: 
   }
 }
 
-function assertNoError(type: PropType, values: Object, options?: Options) {
+function assertNoError(type: t.Any, values: Object, options?: Options) {
   const error = runPropTypes(getPropTypes(type, options), values)
   assert.strictEqual(error, null)
 }
@@ -49,6 +49,22 @@ describe('getPropTypes', () => {
     const T = t.refinement(t.interface({ a: t.number }), v => v.a >= 0)
     assertNoError(T, { a: 1 })
     assertError(T, { a: -1 }, '\nInvalid value {"a":-1} supplied to : ({ a: number } | <function1>)')
+  });
+
+  it('should handle intersections', function () {
+    const A = t.interface({ a: t.string })
+    const B = t.interface({ b: t.number })
+    const T = t.intersection([A, B])
+    assertNoError(T, { a: 's', b: 1 })
+    assertError(T, { a: 2, b: 1 }, '\nInvalid value 2 supplied to : ({ a: string } & { b: number })/a: string')
+    assertError(T, { a: 's', b: 1, c: 2 }, '\nInvalid additional prop(s): ["c"]')
+    const T2 = t.intersection([t.any, t.any])
+    assertNoError(T2, { a: 's', b: 1, c: 2 })
+  });
+
+  it('should handle Any', function () {
+    const T = t.any
+    assertNoError(T, { a: 's', b: 1 })
   });
 
 })
