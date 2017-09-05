@@ -1,6 +1,6 @@
 {
   "name": "prop-types-ts",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Alternative syntax for prop types providing both static and runtime type safety, powered by io-ts",
   "files": ["lib"],
   "main": "lib/index.js",
@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/gcanti/prop-types-ts",
   "dependencies": {
-    "io-ts": "^0.6.0",
+    "io-ts": "^0.7.0",
     "react": "^15.0.0"
   },
   "devDependencies": {
@@ -36,7 +36,7 @@
     "ts-node": "3.2.0",
     "tslint": "^4.4.2",
     "tslint-config-standard": "^4.0.0",
-    "typescript": "2.4.1"
+    "typescript": "^2.5.2"
   },
   "tags": ["typescript", "react", "prop-types", "io-ts"],
   "keywords": ["typescript", "react", "prop-types", "io-ts"]

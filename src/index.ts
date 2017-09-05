@@ -83,49 +83,44 @@ export function props(type: PropTypeable, options?: Options): (C: ComponentClass
   return noop
 }
 
-export interface ReactElement extends t.Type<React.ReactElement<any>> {
-  readonly _tag: 'ReactElement'
+export class ReactElementType implements t.Type<React.ReactElement<any>> {
+  readonly _tag: 'ReactElement' = 'ReactElement'
+  readonly _A: React.ReactElement<any>
+  readonly name: string = 'ReactElement'
+  readonly validate: t.Validate<React.ReactElement<any>> = (v, c) =>
+    React.isValidElement(v) ? t.success(v) : t.failure(v, c)
 }
 
-export const ReactElement: ReactElement = {
-  _A: t._A,
-  _tag: 'ReactElement',
-  name: 'ReactElement',
-  validate: (v, c) => (React.isValidElement(v) ? t.success(v) : t.failure(v, c))
+export const ReactElement: ReactElementType = new ReactElementType()
+
+export class ReactChildType implements t.Type<React.ReactChild> {
+  readonly _tag: 'ReactChild' = 'ReactChild'
+  readonly _A: React.ReactChild
+  readonly name: string = 'ReactChild'
+  readonly validate: t.Validate<React.ReactChild> = (v, c) =>
+    t.is(v, t.string) || t.is(v, t.number) || t.is(v, ReactElement) ? t.success(v) : t.failure(v, c)
 }
 
-export interface ReactChild extends t.Type<React.ReactChild> {
-  readonly _tag: 'ReactChild'
+export const ReactChild: ReactChildType = new ReactChildType()
+
+export class ReactFragmentType implements t.Type<React.ReactFragment> {
+  readonly _tag: 'ReactFragment' = 'ReactFragment'
+  readonly _A: React.ReactFragment
+  readonly name: string = 'ReactFragment'
+  readonly validate: t.Validate<React.ReactFragment> = (v, c) =>
+    t.is(v, t.Dictionary) || t.is(v, t.array(ReactNode)) ? t.success(v) : t.failure(v, c)
 }
 
-export const ReactChild: ReactChild = {
-  _A: t._A,
-  _tag: 'ReactChild',
-  name: 'ReactChild',
-  validate: (v, c) => (t.is(v, t.string) || t.is(v, t.number) || t.is(v, ReactElement) ? t.success(v) : t.failure(v, c))
-}
+export const ReactFragment: ReactFragmentType = new ReactFragmentType()
 
-export interface ReactFragment extends t.Type<React.ReactFragment> {
-  readonly _tag: 'ReactFragment'
-}
-
-export const ReactFragment: ReactFragment = {
-  _A: t._A,
-  _tag: 'ReactFragment',
-  name: 'ReactFragment',
-  validate: (v, c) => (t.is(v, t.Dictionary) || t.is(v, t.array(ReactNode)) ? t.success(v) : t.failure(v, c))
-}
-
-export interface ReactNode extends t.Type<React.ReactNode> {
-  readonly _tag: 'ReactNode'
-}
-
-export const ReactNode: ReactNode = {
-  _A: t._A,
-  _tag: 'ReactNode',
-  name: 'ReactNode',
-  validate: (v, c) =>
+export class ReactNodeType implements t.Type<React.ReactNode> {
+  readonly _tag: 'ReactNode' = 'ReactNode'
+  readonly _A: React.ReactNode
+  readonly name: string = 'ReactNode'
+  readonly validate: t.Validate<React.ReactNode> = (v, c) =>
     t.is(v, ReactChild) || t.is(v, ReactFragment) || t.is(v, t.boolean) || t.is(v, t.null) || t.is(v, t.undefined)
       ? t.success(v)
       : t.failure(v, c)
 }
+
+export const ReactNode: ReactNodeType = new ReactNodeType()
