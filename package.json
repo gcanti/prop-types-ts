@@ -1,6 +1,6 @@
 {
   "name": "prop-types-ts",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Alternative syntax for prop types providing both static and runtime type safety, powered by io-ts",
   "files": ["lib"],
   "main": "lib/index.js",
@@ -9,7 +9,10 @@
     "lint": "tslint src/**/*.ts test/**/*.ts",
     "clean": "rm -rf lib/*",
     "mocha": "mocha -r ts-node/register test/*.tsx",
-    "prettier": "prettier --no-semi --single-quote --print-width 120 --parser typescript --list-different \"{src,test}/**/*.ts\"",
+    "prettier":
+      "prettier --no-semi --single-quote --print-width 120 --parser typescript --list-different \"{src,test}/**/*.ts\"",
+    "fix-prettier":
+      "prettier --no-semi --single-quote --print-width 120 --parser typescript --write \"{src,test}/**/*.ts\"",
     "test": "npm run lint && npm run prettier && npm run mocha",
     "build": "npm run clean && tsc"
   },
@@ -24,19 +27,19 @@
   },
   "homepage": "https://github.com/gcanti/prop-types-ts",
   "dependencies": {
-    "io-ts": "^0.7.0",
+    "io-ts": "^0.9.0",
     "react": "^15.0.0"
   },
   "devDependencies": {
     "@types/mocha": "2.2.38",
     "@types/node": "7.0.4",
-    "@types/react": "15.0.38",
+    "@types/react": "15.6.7",
     "mocha": "3.2.0",
-    "prettier": "1.5.2",
+    "prettier": "1.8.2",
     "ts-node": "3.2.0",
     "tslint": "^4.4.2",
     "tslint-config-standard": "^4.0.0",
-    "typescript": "^2.5.2"
+    "typescript": "2.6.1"
   },
   "tags": ["typescript", "react", "prop-types", "io-ts"],
   "keywords": ["typescript", "react", "prop-types", "io-ts"]

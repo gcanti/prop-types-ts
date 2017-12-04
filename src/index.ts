@@ -8,7 +8,7 @@ const noop = () => {}
 
 export type Options = {
   strict?: boolean
-  children?: t.Type<any>
+  children?: t.Any
 }
 
 function getExcessProps(values: Object, props: t.Props): Array<string> {
@@ -73,8 +73,10 @@ export function getPropTypes(type: PropTypeable, options: Options = { strict: tr
   }
 }
 
+const NODE_ENV = process.env.NODE_ENV
+
 export function props(type: PropTypeable, options?: Options): (C: ComponentClass<any>) => void {
-  if (process.env.NODE_ENV !== 'production') {
+  if (NODE_ENV !== 'production') {
     const propsTypes = getPropTypes(type, options)
     return function(Component) {
       Component.propTypes = propsTypes
@@ -83,44 +85,51 @@ export function props(type: PropTypeable, options?: Options): (C: ComponentClass
   return noop
 }
 
-export class ReactElementType implements t.Type<React.ReactElement<any>> {
+export class ReactElementType extends t.Type<any, React.ReactElement<any>> {
   readonly _tag: 'ReactElement' = 'ReactElement'
-  readonly _A: React.ReactElement<any>
-  readonly name: string = 'ReactElement'
-  readonly validate: t.Validate<React.ReactElement<any>> = (v, c) =>
-    React.isValidElement(v) ? t.success(v) : t.failure(v, c)
+  constructor() {
+    super(
+      'ReactElement',
+      React.isValidElement,
+      (v, c) => (React.isValidElement(v) ? t.success(v) : t.failure(v, c)),
+      x => x
+    )
+  }
 }
 
 export const ReactElement: ReactElementType = new ReactElementType()
 
-export class ReactChildType implements t.Type<React.ReactChild> {
+const isReactChild = (v: any): v is React.ReactChild => t.string.is(v) || t.number.is(v) || ReactElement.is(v)
+
+export class ReactChildType extends t.Type<any, React.ReactChild> {
   readonly _tag: 'ReactChild' = 'ReactChild'
-  readonly _A: React.ReactChild
-  readonly name: string = 'ReactChild'
-  readonly validate: t.Validate<React.ReactChild> = (v, c) =>
-    t.is(v, t.string) || t.is(v, t.number) || t.is(v, ReactElement) ? t.success(v) : t.failure(v, c)
+  constructor() {
+    super('ReactChild', isReactChild, (v, c) => (isReactChild(v) ? t.success(v) : t.failure(v, c)), x => x)
+  }
 }
 
 export const ReactChild: ReactChildType = new ReactChildType()
 
-export class ReactFragmentType implements t.Type<React.ReactFragment> {
+const isReactFragment = (v: any): v is React.ReactFragment => t.Dictionary.is(v) || ReactNodes.is(v)
+
+export class ReactFragmentType extends t.Type<any, React.ReactFragment> {
   readonly _tag: 'ReactFragment' = 'ReactFragment'
-  readonly _A: React.ReactFragment
-  readonly name: string = 'ReactFragment'
-  readonly validate: t.Validate<React.ReactFragment> = (v, c) =>
-    t.is(v, t.Dictionary) || t.is(v, t.array(ReactNode)) ? t.success(v) : t.failure(v, c)
+  constructor() {
+    super('ReactFragment', isReactFragment, (v, c) => (isReactFragment ? t.success(v) : t.failure(v, c)), x => x)
+  }
 }
 
 export const ReactFragment: ReactFragmentType = new ReactFragmentType()
 
-export class ReactNodeType implements t.Type<React.ReactNode> {
+const isReactNode = (v: any): v is React.ReactNode =>
+  t.boolean.is(v) || t.null.is(v) || t.undefined.is(v) || ReactChild.is(v) || ReactFragment.is(v)
+
+export class ReactNodeType extends t.Type<any, React.ReactNode> {
   readonly _tag: 'ReactNode' = 'ReactNode'
-  readonly _A: React.ReactNode
-  readonly name: string = 'ReactNode'
-  readonly validate: t.Validate<React.ReactNode> = (v, c) =>
-    t.is(v, ReactChild) || t.is(v, ReactFragment) || t.is(v, t.boolean) || t.is(v, t.null) || t.is(v, t.undefined)
-      ? t.success(v)
-      : t.failure(v, c)
+  constructor() {
+    super('ReactNode', isReactNode, (v, c) => (isReactNode ? t.success(v) : t.failure(v, c)), x => x)
+  }
 }
 
 export const ReactNode: ReactNodeType = new ReactNodeType()
+const ReactNodes = t.array(ReactNode)

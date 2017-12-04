@@ -21,6 +21,8 @@ function assertNoError(type: PropTypeable, values: Object, options?: Options) {
   assert.strictEqual(error, null)
 }
 
+const is = (value: any, type: t.Any): boolean => t.validate(value, type).fold(() => false, () => true)
+
 describe('getPropTypes', () => {
   it('should check bad values', function() {
     const T = t.interface({ name: t.string })
@@ -71,17 +73,17 @@ describe('getPropTypes', () => {
 
 describe('Pre-defined types', () => {
   it('ReactElement', function() {
-    assert.ok(t.is(<div />, ReactElement))
+    assert.ok(is(<div />, ReactElement))
   })
 
   it('ReactFragment', function() {
-    assert.ok(t.is(<div />, ReactFragment))
-    assert.ok(t.is([<div />, <span />], ReactFragment))
+    assert.ok(is(<div />, ReactFragment))
+    assert.ok(is([<div />, <span />], ReactFragment))
   })
 
   it('ReactNode', function() {
-    assert.ok(t.is(<div />, ReactNode))
-    assert.ok(t.is(false, ReactNode))
-    assert.ok(t.is(null, ReactNode))
+    assert.ok(is(<div />, ReactNode))
+    assert.ok(is(false, ReactNode))
+    assert.ok(is(null, ReactNode))
   })
 })

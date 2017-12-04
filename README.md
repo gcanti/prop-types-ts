@@ -2,7 +2,9 @@ Alternative syntax for prop types powered by [io-ts](https://github.com/gcanti/i
 
 # How it works
 
-The `@props` decorator sets `propTypes` on the target component to use a [custom validator function](https://facebook.github.io/react/docs/reusable-components.html#prop-validation) built around `io-ts` types.
+The `@props` decorator sets `propTypes` on the target component to use a
+[custom validator function](https://facebook.github.io/react/docs/reusable-components.html#prop-validation) built around
+`io-ts` types.
 
 # Usage
 
@@ -13,19 +15,25 @@ import { props } from 'prop-types-ts'
 
 // define the runtime types
 
-const AlertType = t.keyof({
-  success: true,
-  warning: true,
-  info: true
-}, 'AlertType')
+const AlertType = t.keyof(
+  {
+    success: true,
+    warning: true,
+    info: true
+  },
+  'AlertType'
+)
 
-const RuntimeProps = t.interface({
-  type: AlertType
-}, 'Props')
+const RuntimeProps = t.interface(
+  {
+    type: AlertType
+  },
+  'Props'
+)
 
 // extract the static type
 
-export type Props = t.TypeOf<typeof RuntimeProps>;
+export type Props = t.TypeOf<typeof RuntimeProps>
 // same as type Props = { type: 'success' | 'warning' | 'info' }
 
 @props(RuntimeProps)
@@ -54,11 +62,11 @@ export default class Alert extends React.Component<Props, void> {
 # Errors on console
 
 ```ts
-<Alert type="foo" /> // => Invalid value "foo" supplied to : Props/type: AlertType
+;<Alert type="foo" /> // => Invalid value "foo" supplied to : Props/type: AlertType
 ```
 
 ```ts
-<Alert type="info" foo="bar" /> // => Invalid additional prop(s): ["foo"]
+;<Alert type="info" foo="bar" /> // => Invalid additional prop(s): ["foo"]
 ```
 
 # Excess Property Checks
@@ -76,10 +84,10 @@ export default class Alert extends React.Component<Props, void> {
 
 `prop-types-ts` exports some useful pre-defined types:
 
-- `ReactElement`
-- `ReactChild`
-- `ReactFragment`
-- `ReactNode`
+* `ReactElement`
+* `ReactChild`
+* `ReactFragment`
+* `ReactNode`
 
 # Type checking `children`
 
