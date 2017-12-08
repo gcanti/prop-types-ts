@@ -21,13 +21,16 @@ function getExcessProps(values: Object, props: t.Props): Array<string> {
   return excess
 }
 
+export interface PropTypeableRefinement extends t.RefinementType<PropTypeable, any, any> {}
+export interface PropTypeableReadonlyType extends t.ReadonlyType<PropTypeable, any> {}
+export interface PropTypeableIntersection extends t.IntersectionType<Array<PropTypeable>, any> {}
 export type PropTypeable =
   | t.AnyType
-  | t.RefinementType<any>
-  | t.ReadonlyType<any>
-  | t.IntersectionType<any, any>
-  | t.InterfaceType<any>
-  | t.PartialType<any>
+  | PropTypeableRefinement
+  | PropTypeableReadonlyType
+  | PropTypeableIntersection
+  | t.InterfaceType<any, any>
+  | t.PartialType<any, any>
 
 function getProps(type: PropTypeable): t.Props | null {
   switch (type._tag) {
