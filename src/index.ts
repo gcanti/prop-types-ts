@@ -8,7 +8,7 @@ const noop = () => {}
 
 export type Options = {
   strict?: boolean
-  children?: t.Any
+  children?: t.Mixed
 }
 
 function getExcessProps(values: Object, props: t.Props): Array<string> {
@@ -21,48 +21,62 @@ function getExcessProps(values: Object, props: t.Props): Array<string> {
   return excess
 }
 
-export interface PropTypeableRefinement extends t.RefinementType<PropTypeable, any, any> {}
-export interface PropTypeableReadonlyType extends t.ReadonlyType<PropTypeable, any> {}
-export interface PropTypeableIntersection extends t.IntersectionType<Array<PropTypeable>, any> {}
+export interface PropTypeableRefinement extends t.RefinementType<PropTypeable> {}
+export interface PropTypeableReadonlyType extends t.ReadonlyType<PropTypeable> {}
+export interface PropTypeableIntersection extends t.IntersectionType<Array<PropTypeable>> {}
+export interface PropTypeableUnion extends t.UnionType<Array<PropTypeable>> {}
 export type PropTypeable =
   | t.AnyType
   | PropTypeableRefinement
   | PropTypeableReadonlyType
   | PropTypeableIntersection
-  | t.InterfaceType<any, any>
-  | t.PartialType<any, any>
+  | t.InterfaceType<any>
+  | t.StrictType<any>
+  | t.PartialType<any>
+  | PropTypeableUnion
 
-function getProps(type: PropTypeable): t.Props | null {
+function getProps(values: any, type: PropTypeable): t.Props | null {
   switch (type._tag) {
+    case 'AnyType':
+      return null
     case 'RefinementType':
     case 'ReadonlyType':
-      return getProps(type.type)
+      return getProps(values, type.type)
     case 'IntersectionType':
-      const props = type.types.map(getProps).filter(Boolean)
+      const props = type.types.map(type => getProps(values, type)).filter(Boolean)
       if (props.length) {
         return Object.assign.apply(null, [{}].concat(props))
+      } else {
+        return null
       }
-      break
     case 'InterfaceType':
     case 'PartialType':
+    case 'StrictType':
       return type.props
+    case 'UnionType':
+      for (const member of type.types) {
+        if (member.is(values)) {
+          return getProps(values, member)
+        }
+      }
+      return null
   }
-  return null
 }
 
 export function getPropTypes(type: PropTypeable, options: Options = { strict: true }) {
-  const props = options.strict ? getProps(type) : null
   return {
     __prop_types_ts(values: any, prop: string, displayName: string): Error | null {
-      const validation = t.validate(values, type).chain(v => {
+      const validation = type.decode(values).chain(v => {
         if (options.children) {
           return options.children.validate(values.children, [{ key: 'children', type: options.children }])
+        } else {
+          return t.success(v)
         }
-        return t.success(v)
       })
       return validation.fold(
         () => new Error('\n' + PathReporter.report(validation).join('\n')),
         () => {
+          const props = options.strict ? getProps(values, type) : null
           if (props) {
             const excess = getExcessProps(values, props)
             if (excess.length > 0) {
@@ -88,51 +102,61 @@ export function props(type: PropTypeable, options?: Options): (C: ComponentClass
   return noop
 }
 
-export class ReactElementType extends t.Type<any, React.ReactElement<any>> {
+export class ReactElementType extends t.Type<React.ReactElement<any>> {
   readonly _tag: 'ReactElement' = 'ReactElement'
   constructor() {
     super(
       'ReactElement',
       React.isValidElement,
-      (v, c) => (React.isValidElement(v) ? t.success(v) : t.failure(v, c)),
-      x => x
+      (m, c) => t.object.validate(m, c).chain(o => (React.isValidElement<any>(o) ? t.success(o) : t.failure(o, c))),
+      t.identity
     )
   }
 }
 
 export const ReactElement: ReactElementType = new ReactElementType()
 
-const isReactChild = (v: any): v is React.ReactChild => t.string.is(v) || t.number.is(v) || ReactElement.is(v)
-
-export class ReactChildType extends t.Type<any, React.ReactChild> {
+export class ReactChildType extends t.Type<React.ReactChild> {
   readonly _tag: 'ReactChild' = 'ReactChild'
   constructor() {
-    super('ReactChild', isReactChild, (v, c) => (isReactChild(v) ? t.success(v) : t.failure(v, c)), x => x)
+    super(
+      'ReactChild',
+      (m): m is React.ReactChild => t.string.is(m) || t.number.is(m) || ReactElement.is(m),
+      (m, c) => (this.is(m) ? t.success(m) : t.failure(m, c)),
+      t.identity
+    )
   }
 }
 
 export const ReactChild: ReactChildType = new ReactChildType()
 
-const isReactFragment = (v: any): v is React.ReactFragment => t.Dictionary.is(v) || ReactNodes.is(v)
-
-export class ReactFragmentType extends t.Type<any, React.ReactFragment> {
+export class ReactFragmentType extends t.Type<React.ReactFragment> {
   readonly _tag: 'ReactFragment' = 'ReactFragment'
   constructor() {
-    super('ReactFragment', isReactFragment, (v, c) => (isReactFragment ? t.success(v) : t.failure(v, c)), x => x)
+    super(
+      'ReactFragment',
+      (m): m is React.ReactFragment => t.Dictionary.is(m) || ReactNodes.is(m),
+      (m, c) => (this.is(m) ? t.success(m) : t.failure(m, c)),
+      t.identity
+    )
   }
 }
 
 export const ReactFragment: ReactFragmentType = new ReactFragmentType()
 
-const isReactNode = (v: any): v is React.ReactNode =>
-  t.boolean.is(v) || t.null.is(v) || t.undefined.is(v) || ReactChild.is(v) || ReactFragment.is(v)
-
-export class ReactNodeType extends t.Type<any, React.ReactNode> {
+export class ReactNodeType extends t.Type<React.ReactNode> {
   readonly _tag: 'ReactNode' = 'ReactNode'
   constructor() {
-    super('ReactNode', isReactNode, (v, c) => (isReactNode ? t.success(v) : t.failure(v, c)), x => x)
+    super(
+      'ReactNode',
+      (m): m is React.ReactNode =>
+        t.boolean.is(m) || t.null.is(m) || t.undefined.is(m) || ReactChild.is(m) || ReactFragment.is(m),
+      (m, c) => (this.is(m) ? t.success(m) : t.failure(m, c)),
+      t.identity
+    )
   }
 }
 
 export const ReactNode: ReactNodeType = new ReactNodeType()
+
 const ReactNodes = t.array(ReactNode)

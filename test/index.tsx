@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import { getPropTypes, Options, ReactElement, ReactNode, ReactFragment, PropTypeable } from '../src/index'
+import { getPropTypes, Options, ReactElement, ReactNode, ReactFragment, ReactChild, PropTypeable } from '../src/index'
 import * as t from 'io-ts'
 import * as React from 'react'
 
@@ -21,26 +21,24 @@ function assertNoError(type: PropTypeable, values: Object, options?: Options) {
   assert.strictEqual(error, null)
 }
 
-const is = (value: any, type: t.Any): boolean => t.validate(value, type).fold(() => false, () => true)
-
 describe('getPropTypes', () => {
-  it('should check bad values', function() {
+  it('should check bad values', () => {
     const T = t.interface({ name: t.string })
     assertError(T, {}, '\nInvalid value undefined supplied to : { name: string }/name: string')
     assertNoError(T, { name: 'name' })
   })
 
-  it('should check excess props', function() {
+  it('should check excess props', () => {
     const T = t.interface({ name: t.string })
     assertError(T, { name: 'name', a: 1 }, '\nInvalid additional prop(s): ["a"]')
   })
 
-  it('should handle strict = false option', function() {
+  it('should handle strict = false option', () => {
     const T = t.interface({ name: t.string })
     assertNoError(T, { name: 'name', a: 1 }, { strict: false })
   })
 
-  it('should handle children option', function() {
+  it('should handle children option', () => {
     const T = t.interface({ name: t.string })
     assertNoError(T, { name: 'name', children: 1 }, { children: t.number })
     assertError(T, { name: 'name', children: 's' }, '\nInvalid value "s" supplied to children: number', {
@@ -48,13 +46,13 @@ describe('getPropTypes', () => {
     })
   })
 
-  it('should handle refinements', function() {
+  it('should handle refinements', () => {
     const T = t.refinement(t.interface({ a: t.number }), v => v.a >= 0)
     assertNoError(T, { a: 1 })
     assertError(T, { a: -1 }, '\nInvalid value {"a":-1} supplied to : ({ a: number } | <function1>)')
   })
 
-  it('should handle intersections', function() {
+  it('should handle intersections', () => {
     const A = t.interface({ a: t.string })
     const B = t.interface({ b: t.number })
     const T = t.intersection([A, B])
@@ -65,25 +63,62 @@ describe('getPropTypes', () => {
     assertNoError(T2, { a: 's', b: 1, c: 2 })
   })
 
-  it('should handle Any', function() {
+  it('should handle any', () => {
     const T = t.any
     assertNoError(T, { a: 's', b: 1 })
+  })
+
+  it('should handle unions', function() {
+    const T = t.union([t.interface({ a: t.string }), t.interface({ b: t.number })])
+    assertNoError(T, { a: 's' })
+    assertNoError(T, { b: 1 })
+    assertError(T, { a: 's', b: 1 }, '\nInvalid additional prop(s): ["b"]')
+  })
+
+  it('should handle tagged unions', function() {
+    const T = t.taggedUnion('type', [
+      t.interface({ type: t.literal('A'), a: t.string }),
+      t.interface({ type: t.literal('B'), b: t.number })
+    ])
+    assertNoError(T, { type: 'A', a: 's' })
+    assertNoError(T, { type: 'B', b: 1 })
+    assertError(T, { type: 'A', a: 's', b: 1 }, '\nInvalid additional prop(s): ["b"]')
   })
 })
 
 describe('Pre-defined types', () => {
-  it('ReactElement', function() {
-    assert.ok(is(<div />, ReactElement))
+  it('ReactElement', () => {
+    const T = ReactElement
+    assert.strictEqual(T.is(<div />), true)
+    assert.strictEqual(T.is(null), false)
+    assert.strictEqual(T.is(NaN), false)
   })
 
-  it('ReactFragment', function() {
-    assert.ok(is(<div />, ReactFragment))
-    assert.ok(is([<div />, <span />], ReactFragment))
+  it('ReactFragment', () => {
+    const T = ReactFragment
+    assert.strictEqual(T.is(<div />), true)
+    assert.strictEqual(T.is([<div />, <span />]), true)
+    assert.strictEqual(T.is(null), false)
+    assert.strictEqual(T.is(NaN), false)
   })
 
-  it('ReactNode', function() {
-    assert.ok(is(<div />, ReactNode))
-    assert.ok(is(false, ReactNode))
-    assert.ok(is(null, ReactNode))
+  it('ReactChild', () => {
+    const T = ReactChild
+    assert.strictEqual(t.Dictionary.is(NaN), false)
+    assert.strictEqual(T.is(true), false)
+  })
+
+  it('ReactNode', () => {
+    const T = ReactNode
+    assert.strictEqual(T.is(<div />), true)
+    assert.strictEqual(T.is(false), true)
+    assert.strictEqual(T.is(null), true)
+    assert.strictEqual(T.is(undefined), true)
+    assert.strictEqual(
+      T.is(() => {
+        return undefined
+      }),
+      false
+    )
   })
 })
