@@ -1,6 +1,7 @@
 import { ComponentClass } from 'react'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
+import { Reporter } from 'io-ts/lib/Reporter'
 import * as React from 'react'
 
 // tslint:disable-next-line no-empty
@@ -9,6 +10,7 @@ const noop = () => {}
 export type Options = {
   strict?: boolean
   children?: t.Mixed
+  reporter?: Reporter<string[]>
 }
 
 function getExcessProps(values: Object, props: t.Props): Array<string> {
@@ -64,6 +66,8 @@ function getProps(values: any, type: PropTypeable): t.Props | null {
 }
 
 export function getPropTypes(type: PropTypeable, options: Options = { strict: true }) {
+  const reporter = options.reporter || PathReporter
+
   return {
     __prop_types_ts(values: any, prop: string, displayName: string): Error | null {
       const validation = type.decode(values).chain(v => {
@@ -74,7 +78,7 @@ export function getPropTypes(type: PropTypeable, options: Options = { strict: tr
         }
       })
       return validation.fold(
-        () => new Error('\n' + PathReporter.report(validation).join('\n')),
+        () => new Error('\n' + reporter.report(validation).join('\n')),
         () => {
           const props = options.strict ? getProps(values, type) : null
           if (props) {
