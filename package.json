@@ -1,6 +1,6 @@
 {
   "name": "prop-types-ts",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Alternative syntax for prop types providing both static and runtime type safety, powered by io-ts",
   "files": [
     "lib"
@@ -35,7 +35,7 @@
     "@types/node": "7.0.4",
     "@types/react": "^16.0.38",
     "mocha": "3.2.0",
-    "prettier": "^1.11.0",
+    "prettier": "^1.14.3",
     "ts-node": "3.2.0",
     "tslint": "^4.4.2",
     "tslint-config-standard": "^4.0.0",
