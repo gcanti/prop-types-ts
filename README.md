@@ -84,10 +84,10 @@ export default class Alert extends React.Component<Props, void> {
 
 `prop-types-ts` exports some useful pre-defined types:
 
-* `ReactElement`
-* `ReactChild`
-* `ReactFragment`
-* `ReactNode`
+- `ReactElement`
+- `ReactChild`
+- `ReactFragment`
+- `ReactNode`
 
 # Type checking `children`
 
@@ -133,3 +133,7 @@ export default class Alert extends React.Component<Props, void> {
 <Alert type="info">hello</Alert> // => Invalid value "hello" supplied to children: JSXButton
 <Alert type="info"><button>Click me</button></Alert> // no errors
 ```
+
+# TypeScript compatibility
+
+The stable version is tested against TypeScript 3.2.2, but should run with TypeScript 2.7.1+ too

@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import { getPropTypes, Options, ReactElement, ReactNode, ReactFragment, ReactChild, PropTypeable } from '../src/index'
+import { getPropTypes, Options, ReactElement, ReactNode, ReactFragment, ReactChild, PropTypeable } from '../src'
 import * as t from 'io-ts'
 import * as React from 'react'
 
