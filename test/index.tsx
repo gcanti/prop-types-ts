@@ -57,7 +57,7 @@ describe('getPropTypes', () => {
     const B = t.interface({ b: t.number })
     const T = t.intersection([A, B])
     assertNoError(T, { a: 's', b: 1 })
-    assertError(T, { a: 2, b: 1 }, '\nInvalid value 2 supplied to : ({ a: string } & { b: number })/a: string')
+    assertError(T, { a: 2, b: 1 }, '\nInvalid value 2 supplied to : ({ a: string } & { b: number })/0: { a: string }/a: string')
     assertError(T, { a: 's', b: 1, c: 2 }, '\nInvalid additional prop(s): ["c"]')
     const T2 = t.intersection([t.any, t.any])
     assertNoError(T2, { a: 's', b: 1, c: 2 })

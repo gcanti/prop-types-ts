@@ -1,5 +1,5 @@
-import { ComponentClass } from 'react'
 import * as t from 'io-ts'
+import { chain, fold } from 'fp-ts/lib/Either'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { Reporter } from 'io-ts/lib/Reporter'
 import * as React from 'react'
@@ -70,14 +70,15 @@ export function getPropTypes(type: PropTypeable, options: Options = { strict: tr
 
   return {
     __prop_types_ts(values: any, prop: string, displayName: string): Error | null {
-      const validation = type.decode(values).chain(v => {
+      const validation = chain(v => {
         if (options.children) {
           return options.children.validate(values.children, [{ key: 'children', type: options.children }])
         } else {
           return t.success(v)
         }
-      })
-      return validation.fold(
+      })(type.decode(values))
+
+      return fold(
         () => new Error('\n' + reporter.report(validation).join('\n')),
         () => {
           const props = options.strict ? getProps(values, type) : null
@@ -89,14 +90,14 @@ export function getPropTypes(type: PropTypeable, options: Options = { strict: tr
           }
           return null
         }
-      )
+      )(validation)
     }
   }
 }
 
 const NODE_ENV = process.env.NODE_ENV
 
-export function props(type: PropTypeable, options?: Options): (C: ComponentClass<any>) => void {
+export function props(type: PropTypeable, options?: Options): (C: React.ComponentClass<any>) => void {
   if (NODE_ENV !== 'production') {
     const propsTypes = getPropTypes(type, options)
     return function(Component) {
@@ -112,7 +113,10 @@ export class ReactElementType extends t.Type<React.ReactElement<any>> {
     super(
       'ReactElement',
       React.isValidElement,
-      (m, c) => t.object.validate(m, c).chain(o => (React.isValidElement<any>(o) ? t.success(o) : t.failure(o, c))),
+      (m, c) =>
+        chain(o => (React.isValidElement<any>(o as any) ? t.success(o as any) : t.failure(o, c)))(
+          t.object.validate(m, c)
+        ),
       t.identity
     )
   }
