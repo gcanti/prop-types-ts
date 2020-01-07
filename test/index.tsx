@@ -47,6 +47,7 @@ describe('getPropTypes', () => {
   })
 
   it('should handle refinements', () => {
+    // tslint:disable-next-line: deprecation
     const T = t.refinement(t.interface({ a: t.number }), v => v.a >= 0)
     assertNoError(T, { a: 1 })
     assertError(T, { a: -1 }, '\nInvalid value {"a":-1} supplied to : ({ a: number } | <function1>)')
@@ -57,13 +58,19 @@ describe('getPropTypes', () => {
     const B = t.interface({ b: t.number })
     const T = t.intersection([A, B])
     assertNoError(T, { a: 's', b: 1 })
-    assertError(T, { a: 2, b: 1 }, '\nInvalid value 2 supplied to : ({ a: string } & { b: number })/0: { a: string }/a: string')
+    assertError(
+      T,
+      { a: 2, b: 1 },
+      '\nInvalid value 2 supplied to : ({ a: string } & { b: number })/0: { a: string }/a: string'
+    )
     assertError(T, { a: 's', b: 1, c: 2 }, '\nInvalid additional prop(s): ["c"]')
+    // tslint:disable-next-line: deprecation
     const T2 = t.intersection([t.any, t.any])
     assertNoError(T2, { a: 's', b: 1, c: 2 })
   })
 
   it('should handle any', () => {
+    // tslint:disable-next-line: deprecation
     const T = t.any
     assertNoError(T, { a: 's', b: 1 })
   })
@@ -76,7 +83,7 @@ describe('getPropTypes', () => {
   })
 
   it('should handle tagged unions', function() {
-    const T = t.taggedUnion('type', [
+    const T = t.union([
       t.interface({ type: t.literal('A'), a: t.string }),
       t.interface({ type: t.literal('B'), b: t.number })
     ])
@@ -104,7 +111,7 @@ describe('Pre-defined types', () => {
 
   it('ReactChild', () => {
     const T = ReactChild
-    assert.strictEqual(t.Dictionary.is(NaN), false)
+    assert.strictEqual(t.UnknownRecord.is(NaN), false)
     assert.strictEqual(T.is(true), false)
   })
 

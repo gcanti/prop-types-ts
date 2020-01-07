@@ -3,21 +3,17 @@
     "outDir": "./lib",
     "sourceMap": true,
     "declaration": true,
+    "target": "es5",
     "module": "commonjs",
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "noImplicitReturns": false,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "noEmitOnError": false,
-    "allowJs": false,
-    "strictNullChecks": true,
-    "target": "es5",
-    "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "lib": ["es2015", "dom"]
+    "lib": ["es6", "dom"]
   },
   "include": ["./src/**/*"]
 }

@@ -13,6 +13,11 @@
 **Note**: Gaps between patch versions are faulty/broken releases. **Note**: A feature tagged as Experimental is in a
 high state of flux, you're at risk of it changing without notice.
 
+# 0.7.0
+
+- **Breaking Change**
+  - Upgrade to io-ts@2 and add fp-ts dependency, #20 (@ifiokjr)
+
 # 0.6.2
 
 - **Polish**

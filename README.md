@@ -62,11 +62,11 @@ export default class Alert extends React.Component<Props, void> {
 # Errors on console
 
 ```ts
-;<Alert type="foo" /> // => Invalid value "foo" supplied to : Props/type: AlertType
+<Alert type="foo" /> // => Invalid value "foo" supplied to : Props/type: AlertType
 ```
 
 ```ts
-;<Alert type="info" foo="bar" /> // => Invalid additional prop(s): ["foo"]
+<Alert type="info" foo="bar" /> // => Invalid additional prop(s): ["foo"]
 ```
 
 # Excess Property Checks
@@ -136,4 +136,7 @@ export default class Alert extends React.Component<Props, void> {
 
 # TypeScript compatibility
 
-The stable version is tested against TypeScript 3.2.2, but should run with TypeScript 2.7.1+ too
+| `prop-type-ts` version | required `typescript` version |
+| ---------------------- | ----------------------------- |
+| 0.7.x+                 | 3.5+                          |
+| 0.6.x+                 | 3.2+                          |
