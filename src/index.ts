@@ -95,7 +95,7 @@ export function getPropTypes(type: PropTypeable, options: Options = { strict: tr
   const reporter = options.reporter || PathReporter
 
   return {
-    __prop_types_ts(values: any, prop: string, displayName: string): Error | null {
+    __prop_types_ts(values: any, _prop: string, _displayName: string): Error | null {
       const validation = either.chain(type.decode(values), v => {
         if (options.children) {
           return options.children.validate(values.children, [{ key: 'children', type: options.children }])
