@@ -1,6 +1,6 @@
 {
   "name": "prop-types-ts",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Alternative syntax for prop types providing both static and runtime type safety, powered by io-ts",
   "files": [
     "lib",
@@ -9,6 +9,7 @@
   "main": "lib/index.js",
   "module": "es6/index.js",
   "typings": "lib/index.d.ts",
+  "sideEffects": false,
   "scripts": {
     "lint": "tslint -p tsconfig.tslint.json",
     "clean": "rm -rf lib/*",

@@ -13,12 +13,7 @@
 **Note**: Gaps between patch versions are faulty/broken releases. **Note**: A feature tagged as Experimental is in a
 high state of flux, you're at risk of it changing without notice.
 
-# 0.7.2
-
-- **Bug Fix**
-  - add module field in package.json (@gcanti)
-
-# 0.7.1
+# 0.7.3
 
 - **New Feature**
   - add build in ES6 format (@gcanti)
