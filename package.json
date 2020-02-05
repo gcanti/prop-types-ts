@@ -1,6 +1,6 @@
 {
   "name": "prop-types-ts",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Alternative syntax for prop types providing both static and runtime type safety, powered by io-ts",
   "files": [
     "lib",
@@ -43,7 +43,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^13.1.4",
     "@types/react": "^16.9.17",
-    "docs-ts": "^0.3.0",
+    "docs-ts": "^0.3.4",
     "import-path-rewrite": "github:gcanti/import-path-rewrite",
     "mocha": "^5.2.0",
     "prettier": "^1.19.1",

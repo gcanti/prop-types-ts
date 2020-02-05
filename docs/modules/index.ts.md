@@ -22,12 +22,12 @@ Added in v0.6.0
 - [ReactElementType (class)](#reactelementtype-class)
 - [ReactFragmentType (class)](#reactfragmenttype-class)
 - [ReactNodeType (class)](#reactnodetype-class)
-- [ReactChild (constant)](#reactchild-constant)
-- [ReactElement (constant)](#reactelement-constant)
-- [ReactFragment (constant)](#reactfragment-constant)
-- [ReactNode (constant)](#reactnode-constant)
-- [getPropTypes (function)](#getproptypes-function)
-- [props (function)](#props-function)
+- [ReactChild](#reactchild)
+- [ReactElement](#reactelement)
+- [ReactFragment](#reactfragment)
+- [ReactNode](#reactnode)
+- [getPropTypes](#getproptypes)
+- [props](#props)
 
 ---
 
@@ -157,7 +157,7 @@ export class ReactNodeType {
 
 Added in v0.6.0
 
-# ReactChild (constant)
+# ReactChild
 
 **Signature**
 
@@ -167,7 +167,7 @@ export const ReactChild: ReactChildType = ...
 
 Added in v0.6.0
 
-# ReactElement (constant)
+# ReactElement
 
 **Signature**
 
@@ -177,7 +177,7 @@ export const ReactElement: ReactElementType = ...
 
 Added in v0.6.0
 
-# ReactFragment (constant)
+# ReactFragment
 
 **Signature**
 
@@ -187,7 +187,7 @@ export const ReactFragment: ReactFragmentType = ...
 
 Added in v0.6.0
 
-# ReactNode (constant)
+# ReactNode
 
 **Signature**
 
@@ -197,7 +197,7 @@ export const ReactNode: ReactNodeType = ...
 
 Added in v0.6.0
 
-# getPropTypes (function)
+# getPropTypes
 
 **Signature**
 
@@ -207,7 +207,7 @@ export function getPropTypes(type: PropTypeable, options: Options = { strict: tr
 
 Added in v0.6.0
 
-# props (function)
+# props
 
 **Signature**
 
